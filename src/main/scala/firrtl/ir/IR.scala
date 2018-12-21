@@ -357,20 +357,21 @@ case class Conditionally(
 }
 case class CFor(
     info: Info,
+    index: Expression,
     min: Int,
     extent: Int,
     stride: Int,
     body: Statement) extends Statement with HasInfo {
   def serialize: String =
-    s"cFor $min, $extent, $stride :" + info.serialize +
+    s"cFor ${index.serialize}, $min, $extent, $stride :" + info.serialize +
     indent("\n" + body.serialize)
-  def mapStmt(f: Statement => Statement): Statement = CFor(info, min, extent, stride, f(body))
-  def mapExpr(f: Expression => Expression): Statement = this
+  def mapStmt(f: Statement => Statement): Statement = CFor(info, index, min, extent, stride, f(body))
+  def mapExpr(f: Expression => Expression): Statement = CFor(info, f(index), min, extent, stride, body)
   def mapType(f: Type => Type): Statement = this
   def mapString(f: String => String): Statement = this
   def mapInfo(f: Info => Info): Statement = this.copy(info = f(info))
   def foreachStmt(f: Statement => Unit): Unit = { f(body) }
-  def foreachExpr(f: Expression => Unit): Unit = Unit
+  def foreachExpr(f: Expression => Unit): Unit = { f(index) }
   def foreachType(f: Type => Unit): Unit = Unit
   def foreachString(f: String => Unit): Unit = Unit
   def foreachInfo(f: Info => Unit): Unit = f(info)

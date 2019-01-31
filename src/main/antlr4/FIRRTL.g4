@@ -105,6 +105,7 @@ stmt
   | exp '<-' exp info?
   | exp 'is' 'invalid' info?
   | when
+  | loop
   | 'stop(' exp exp intLit ')' info?
   | 'printf(' exp exp StringLit ( exp)* ')' info?
   | 'skip' info?
@@ -140,6 +141,10 @@ suite
 
 when
   : 'when' exp ':' info? suite? ('else' ( when | ':' info? suite?) )?
+  ;
+
+loop
+  : 'loop' exp ':' info? suite?
   ;
 
 info

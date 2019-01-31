@@ -14,6 +14,7 @@ class ChirrtlToHighFirrtl extends CoreTransform {
     passes.CheckChirrtl,
     passes.CInferTypes,
     passes.CInferMDir,
+    loop.LoopTransform,
     passes.RemoveCHIRRTL)
 }
 

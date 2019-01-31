@@ -226,12 +226,19 @@ class Visitor(infoMode: InfoMode) extends FIRRTLBaseVisitor[FirrtlNode] {
     Conditionally(info, visitExp(ctx.exp()), visitSuite(ctx.suite(0)), alt)
   }
 
+  private def visitLoop[FirrtlNode](ctx: LoopContext): Loop = {
+    val info = visitInfo(Option(ctx.info()), ctx)
+
+    Loop(info, visitExp(ctx.exp()), visitSuite(ctx.suite()))
+  }
+
   // visitStmt
   private def visitStmt[FirrtlNode](ctx: FIRRTLParser.StmtContext): Statement = {
     val ctx_exp = ctx.exp.asScala
     val info = visitInfo(Option(ctx.info), ctx)
     ctx.getChild(0) match {
       case when: WhenContext => visitWhen(when)
+      case loop: LoopContext => visitLoop(loop)
       case term: TerminalNode => term.getText match {
         case "wire" => DefWire(info, ctx.id(0).getText, visitType(ctx.`type`()))
         case "reg" =>

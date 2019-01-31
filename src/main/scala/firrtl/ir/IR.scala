@@ -355,23 +355,20 @@ case class Conditionally(
   def foreachString(f: String => Unit): Unit = Unit
   def foreachInfo(f: Info => Unit): Unit = f(info)
 }
-case class CFor(
+case class Loop(
     info: Info,
-    index: Expression,
-    min: Expression,
-    extent: Expression,
-    stride: Expression,
+    pred: Expression,
     body: Statement) extends Statement with HasInfo {
   def serialize: String =
-    s"cFor ${index.serialize}, ${min.serialize}, ${extent.serialize}, ${stride.serialize} :" + info.serialize +
+    s" loop ${pred.serialize} :" +
     indent("\n" + body.serialize)
-  def mapStmt(f: Statement => Statement): Statement = CFor(info, index, min, extent, stride, f(body))
-  def mapExpr(f: Expression => Expression): Statement = CFor(info, f(index), f(min), f(extent), f(stride), body)
+  def mapStmt(f: Statement => Statement): Statement = Loop(info, pred, f(body))
+  def mapExpr(f: Expression => Expression): Statement = Loop(info, f(pred), body)
   def mapType(f: Type => Type): Statement = this
   def mapString(f: String => String): Statement = this
   def mapInfo(f: Info => Info): Statement = this.copy(info = f(info))
   def foreachStmt(f: Statement => Unit): Unit = { f(body) }
-  def foreachExpr(f: Expression => Unit): Unit = { f(index); f(min); f(extent); f(stride) }
+  def foreachExpr(f: Expression => Unit): Unit = { f(pred) }
   def foreachType(f: Type => Unit): Unit = Unit
   def foreachString(f: String => Unit): Unit = Unit
   def foreachInfo(f: Info => Unit): Unit = f(info)
